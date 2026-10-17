@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <script>
+    // Anchor relative URLs to this folder even when served at /card without a trailing slash.
+    if (!location.pathname.endsWith('/') && !/\.html?$/.test(location.pathname)) {
+      document.write('<base href="' + location.pathname + '/">');
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>You're invited</title>
+  <meta name="description" content="An invitation, sealed with a golden thread." />
+  <meta name="theme-color" content="#07110f" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='8' y='24' width='84' height='56' rx='3' fill='%230f2a23' stroke='%23d9ad5b' stroke-width='4'/%3E%3Cpath d='M8 26 L50 58 L92 26' fill='none' stroke='%23d9ad5b' stroke-width='4'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Great+Vibes&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="card.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <main class="stage" id="stage">
+    <p class="mono cue cue--top" id="cueTop">you are invited</p>
+
+    <div class="env" id="env">
+      <div class="env__back"></div>
+
+      <div class="sleeve" id="sleeve">
+        <article class="card" id="card" aria-label="Wedding invitation">
+          <div class="dio" id="dio">
+            <!-- deepest: the night sky seen through the arch -->
+            <div class="layer layer--sky" style="--z: -90px">
+              <div class="stars" id="stars"></div>
+              <svg class="moon" viewBox="0 0 100 100" aria-hidden="true">
+                <path d="M79.81 26.16 A40.50 40.50 0 1 0 56.97 88.72 A33.75 33.75 0 1 1 79.81 26.16 Z" />
+              </svg>
+              <p class="sky__bismillah" lang="ar" dir="rtl" data-bind="bismillah"></p>
+            </div>
+
+            <!-- domes on the horizon -->
+            <div class="layer layer--skyline" style="--z: -50px">
+              <svg viewBox="0 0 90 140" preserveAspectRatio="none" aria-hidden="true">
+                <g class="skyline">
+                  <path d="M10 62 V54 H80 V62 Z" />
+                  <path d="M33 54 Q33 41 45 38.5 Q57 41 57 54 Z" />
+                  <path d="M44.6 38.6 V34.5 H45.4 V38.6 Z" />
+                  <path d="M19 55 Q19 48.5 25 47.5 Q31 48.5 31 55 Z" />
+                  <path d="M59 55 Q59 48.5 65 47.5 Q71 48.5 71 55 Z" />
+                  <path d="M13.2 56 V39 L14.5 35.5 L15.8 39 V56 Z" />
+                  <path d="M74.2 56 V39 L75.5 35.5 L76.8 39 V56 Z" />
+                </g>
+                <g class="windows">
+                  <path d="M41 50 h1.2 v2.4 h-1.2z M44.4 49 h1.2 v3.4 h-1.2z M47.8 50 h1.2 v2.4 h-1.2z M24.4 51.5 h1.2 v2 h-1.2z M64.4 51.5 h1.2 v2 h-1.2z" />
+                </g>
+              </svg>
+            </div>
+
+            <!-- a gilded inner arch, one sheet of paper behind the front -->
+            <div class="layer layer--gild" style="--z: -22px">
+              <svg viewBox="0 0 90 140" preserveAspectRatio="none" aria-hidden="true">
+                <path fill-rule="evenodd" d="M0 0 H90 V140 H0 Z M19 57 V37 A31 31 0 0 1 45 13 A31 31 0 0 1 71 37 V57 Z" />
+              </svg>
+            </div>
+
+            <!-- the front sheet, with the words -->
+            <div class="layer layer--front" style="--z: 0px">
+              <svg viewBox="0 0 90 140" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <filter id="paper" x="0" y="0" width="100%" height="100%">
+                    <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="7" result="n" />
+                    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.18  0 0 0 0.22 0" result="tint" />
+                    <feComposite in="tint" in2="SourceAlpha" operator="in" result="tex" />
+                    <feMerge><feMergeNode in="SourceGraphic" /><feMergeNode in="tex" /></feMerge>
+                  </filter>
+                  <linearGradient id="foil" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#f6dc9c" />
+                    <stop offset="0.45" stop-color="#b8862f" />
+                    <stop offset="0.7" stop-color="#f3d58e" />
+                    <stop offset="1" stop-color="#9c6d22" />
+                  </linearGradient>
+                </defs>
+                <path class="front__paper" filter="url(#paper)" fill-rule="evenodd" d="M0 0 H90 V140 H0 Z M16 60 V36 A34 34 0 0 1 45 10 A34 34 0 0 1 74 36 V60 Z" />
+                <path class="front__foil" d="M16 60 V36 A34 34 0 0 1 45 10 A34 34 0 0 1 74 36 V60 Z" />
+                <rect class="front__foil" x="3.2" y="3.2" width="83.6" height="133.6" />
+              </svg>
+
+              <div class="words">
+                <p class="hosts" data-bind="hosts"></p>
+                <h1 class="names"><span data-bind="names.0"></span><em>&amp;</em><span data-bind="names.1"></span></h1>
+                <p class="invite" data-bind="invite"></p>
+                <p class="divider" aria-hidden="true">
+                  <svg viewBox="0 0 100 100"><path d="M79.81 26.16 A40.50 40.50 0 1 0 56.97 88.72 A33.75 33.75 0 1 1 79.81 26.16 Z M79.58 47.73 L74.36 53.71 L66.76 51.39 L70.84 58.21 L66.29 64.72 L74.03 62.95 L78.81 69.29 L79.52 61.38 L87.03 58.79 L79.73 55.67 Z" /></svg>
+                </p>
+                <p class="date" id="date"></p>
+                <ul class="events" id="events"></ul>
+                <p class="verse"><span lang="ar" dir="rtl" data-bind="verse.arabic"></span><small data-bind="verse.english"></small></p>
+              </div>
+            </div>
+
+            <!-- closest: two lanterns, hanging in front of everything -->
+            <div class="layer layer--lanterns" style="--z: 40px">
+              <div class="lantern" style="--x: 21%; --len: 19%; --s: 1">
+                <i class="lantern__string"></i>
+                <div class="lantern__body">
+                  <i class="lantern__glow"></i>
+                  <svg viewBox="0 0 24 40" aria-hidden="true">
+                    <path class="l-metal" d="M11 0 h2 v3 h-2z M7 9.5 Q12 1.5 17 9.5 Z M8 33 H16 L12 39.5 Z" />
+                    <path class="l-metal" fill-rule="evenodd" d="M6 10 H18 L21 21 L18 32 H6 L3 21 Z M9 28 V17 Q12 12.5 15 17 V28 Z M4.6 21 L6.6 13 V28.5 Z M19.4 21 L17.4 13 V28.5 Z" />
+                    <path class="l-light" d="M9 28 V17 Q12 12.5 15 17 V28 Z M4.6 21 L6.6 13 V28.5 Z M19.4 21 L17.4 13 V28.5 Z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="lantern" style="--x: 79%; --len: 27%; --s: 0.82">
+                <i class="lantern__string"></i>
+                <div class="lantern__body">
+                  <i class="lantern__glow"></i>
+                  <svg viewBox="0 0 24 40" aria-hidden="true">
+                    <path class="l-metal" d="M11 0 h2 v3 h-2z M7 9.5 Q12 1.5 17 9.5 Z M8 33 H16 L12 39.5 Z" />
+                    <path class="l-metal" fill-rule="evenodd" d="M6 10 H18 L21 21 L18 32 H6 L3 21 Z M9 28 V17 Q12 12.5 15 17 V28 Z M4.6 21 L6.6 13 V28.5 Z M19.4 21 L17.4 13 V28.5 Z" />
+                    <path class="l-light" d="M9 28 V17 Q12 12.5 15 17 V28 Z M4.6 21 L6.6 13 V28.5 Z M19.4 21 L17.4 13 V28.5 Z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="env__pocket">
+        <p class="env__to"><small class="mono">for</small><span id="guest"></span></p>
+      </div>
+      <div class="env__flap" id="flap">
+        <div class="flap__face flap__face--front"></div>
+        <div class="flap__face flap__face--back"></div>
+      </div>
+      <button class="seal" id="seal" aria-label="Open the invitation">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M79.81 26.16 A40.50 40.50 0 1 0 56.97 88.72 A33.75 33.75 0 1 1 79.81 26.16 Z M79.58 47.73 L74.36 53.71 L66.76 51.39 L70.84 58.21 L66.29 64.72 L74.03 62.95 L78.81 69.29 L79.52 61.38 L87.03 58.79 L79.73 55.67 Z" /></svg>
+      </button>
+      <i class="band band--h" id="bandH"></i>
+      <i class="band band--v" id="bandV"></i>
+      <svg class="bow" id="bow" viewBox="-30 -20 60 40" aria-hidden="true">
+        <path d="M-2 0 C-14 -16 -28 -12 -24 -2 C-21 6 -10 4 -2 0 Z" />
+        <path d="M2 0 C14 -16 28 -12 24 -2 C21 6 10 4 2 0 Z" />
+        <path d="M2 1 C6 8 9 14 15 18" />
+        <circle cx="0" cy="0" r="3.4" />
+      </svg>
+    </div>
+
+    <p class="mono cue cue--bottom" id="cueBottom">pull the golden thread <span>· or tap the seal</span></p>
+
+    <nav class="actions" id="actions" aria-label="Invitation actions">
+      <button class="act" id="saveDate">Save the date</button>
+      <a class="act" id="directions" target="_blank" rel="noopener">Directions</a>
+      <a class="act act--gold" id="rsvp" target="_blank" rel="noopener">RSVP</a>
+      <p class="mono countdown" id="countdown"></p>
+    </nav>
+  </main>
+
+  <canvas class="rope" id="rope" aria-hidden="true"></canvas>
+
+  <script type="module" src="card.js"></script>
+</body>
+</html>

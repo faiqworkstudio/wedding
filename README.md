@@ -17,6 +17,22 @@ The music is a little music box composed in code and played live with the Web Au
 | --- | --- |
 | `/` | **The red thread**: a red thread of fate, a heart, a trefoil knot, a music box |
 | `/islamic` | **The Islamic version**: same craft, rebuilt around a nikah |
+| `/card` | **The invitation card** for guests |
+
+### The invitation card (`/card`)
+
+Guests receive a sealed emerald envelope tied with a golden thread. They pull the loose end
+(it's a real little rope simulation) until the bow comes undone, or tap the wax seal. The flap opens,
+the card rises out and the envelope falls away. The card is a layered paper-cut scene: through a gilded
+mihrab arch you see a crescent moon, the Bismillah and domes on a glowing horizon. Two lanterns hang
+in front and light up. Tilt the phone (or move the mouse) and the paper layers shift, their shadows
+move, and the lanterns swing.
+
+- **Personal links:** `/card?to=Uncle%20Rashid%20%26%20family` writes the guest's name on their envelope.
+- **Save the date** downloads a calendar file with every event. **Directions** opens Google Maps.
+  **RSVP** opens WhatsApp with a ready message (set `rsvp.whatsapp` to show it).
+- **Preview:** `/card?open` skips the envelope.
+- Edit `card/config.js` for names, events, venues and addresses. **The venues are placeholders.**
 
 The Islamic version opens with the Bismillah and the decree written fifty thousand years before creation
 (Sahih Muslim 2653). The golden thread draws a mihrab arch around Ar-Rum 30:21, and Al-Baqarah 2:187
@@ -43,6 +59,7 @@ It's static files and needs no build step. Serve the folder (ES modules don't lo
 python3 -m http.server 8000
 # open http://localhost:8000          (red thread)
 # open http://localhost:8000/islamic  (Islamic version)
+# open http://localhost:8000/card     (invitation card)
 ```
 
 Three.js is vendored in `vendor/three` so it runs offline, at the venue or wherever you show it.
@@ -57,6 +74,7 @@ index.html        structure
 css/style.css     typography, grain, layout, the hold button, envelope and letter
 js/config.js      ← your words (red thread version)
 islamic/          the Islamic version: index.html, islamic.css, config.js ← its words
+card/             the invitation: index.html, card.css, card.js, config.js ← guests' details
 js/main.js        boot(config, theme): content, scroll → story, hold-to-tie, countdown, letter
 js/scene.js       Three.js: themes, the thread, the two heartbeats, heart/arch, knot/crescent, her name in stars
 js/music.js       Web Audio music box, or soft ambience
