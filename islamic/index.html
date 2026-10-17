@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>For you, Afreen</title>
+  <meta name="theme-color" content="#07110f" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50.0%208.0%20L79.7%2079.7%20L8.0%2050.0%20L79.7%2020.3%20L50.0%2092.0%20L20.3%2020.3%20L92.0%2050.0%20L20.3%2079.7%20Z' fill='none' stroke='%23e0ac52' stroke-width='6'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400&family=Great+Vibes&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="islamic.css" />
+  <script type="importmap">
+    { "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" } }
+  </script>
+</head>
+<body class="is-locked theme-islamic">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="pattern" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- The gate: nothing moves until she opens it. -->
+  <div class="gate" id="gate" role="button" tabindex="0">
+    <p class="arabic gate__bismillah" lang="ar" dir="rtl" data-bind="gate.bismillah"></p>
+    <p class="mono gate__kicker" data-bind="gate.kicker"></p>
+    <h1 class="gate__title" data-bind="gate.title"></h1>
+    <span class="gate__seal" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><path d="M50.0 8.0 L79.7 79.7 L8.0 50.0 L79.7 20.3 L50.0 92.0 L20.3 20.3 L92.0 50.0 L20.3 79.7 Z" /></svg>
+    </span>
+    <p class="mono gate__hint" data-bind="gate.hint"></p>
+  </div>
+
+  <button class="sound" id="sound" aria-label="Toggle sound" hidden>
+    <span></span><span></span><span></span><span></span>
+  </button>
+
+  <div class="progress" aria-hidden="true"><i id="progress"></i></div>
+
+  <main id="story">
+    <section class="panel panel--opening" data-scene="opening">
+      <p class="lead reveal" data-bind="opening.0"></p>
+      <p class="mono opening__cite fade" data-bind="openingCite"></p>
+      <p class="lead lead--second reveal" data-bind="opening.1"></p>
+      <p class="mono scroll-cue">scroll slowly</p>
+    </section>
+
+    <!-- chapters get injected here -->
+    <div id="chapters"></div>
+
+    <section class="panel panel--verse" data-scene="verse">
+      <figure class="verse">
+        <p class="arabic ayah reveal" lang="ar" dir="rtl" data-bind="verses.0.arabic"></p>
+        <blockquote class="verse__english fade" style="--d:1.2s" data-bind="verses.0.english"></blockquote>
+        <figcaption class="mono fade" style="--d:1.8s" data-bind="verses.0.ref"></figcaption>
+      </figure>
+    </section>
+
+    <section class="panel panel--things" data-scene="things">
+      <h2 class="title reveal" data-bind="smallThings.title"></h2>
+      <ul class="things" id="things"></ul>
+    </section>
+
+    <section class="panel panel--numbers" data-scene="numbers">
+      <h2 class="title reveal" data-bind="numbers.title"></h2>
+      <div class="numbers" id="numbers"></div>
+    </section>
+
+    <section class="panel panel--verse" data-scene="verse-2">
+      <figure class="verse">
+        <p class="arabic ayah reveal" lang="ar" dir="rtl" data-bind="verses.1.arabic"></p>
+        <blockquote class="verse__english fade" style="--d:1.2s" data-bind="verses.1.english"></blockquote>
+        <figcaption class="mono fade" style="--d:1.8s" data-bind="verses.1.ref"></figcaption>
+      </figure>
+    </section>
+
+    <section class="panel panel--vows" data-scene="vows">
+      <h2 class="title reveal" data-bind="vows.title"></h2>
+      <ol class="vows" id="vows"></ol>
+    </section>
+
+    <section class="panel panel--knot" data-scene="knot">
+      <div class="knot" id="knot">
+        <button class="hold" id="hold" aria-describedby="hold-hint">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="hold__track" cx="60" cy="60" r="54" />
+            <circle class="hold__fill" id="holdFill" cx="60" cy="60" r="54" />
+          </svg>
+          <span class="hold__label" data-bind="knot.prompt"></span>
+        </button>
+        <p class="mono hold__hint" id="hold-hint" data-bind="knot.hint"></p>
+      </div>
+
+      <div class="finale" id="finale" aria-live="polite">
+        <p class="finale__after" data-bind="knot.after"></p>
+        <!-- her name is written here in stars, by the 3D scene -->
+        <p class="finale__names"><span data-bind="you"></span> <em>&amp;</em> <span data-bind="her"></span></p>
+        <div class="finale__foot">
+          <p class="arabic finale__dua" lang="ar" dir="rtl" data-bind="dua.arabic"></p>
+          <p class="finale__dua-en" data-bind="dua.english"></p>
+          <p class="mono finale__dua-ref" data-bind="dua.ref"></p>
+          <p class="mono finale__date" id="finaleDate"></p>
+          <p class="mono finale__count" id="countdown"></p>
+          <button class="envelope" id="envelope" aria-label="Open the letter">
+            <span class="envelope__back"></span>
+            <span class="envelope__paper"></span>
+            <span class="envelope__flap"></span>
+            <span class="envelope__seal"></span>
+          </button>
+          <p class="mono envelope__hint">one more thing</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="letter" id="letter" role="dialog" aria-modal="true" aria-label="A letter" hidden>
+    <article class="letter__paper">
+      <div class="letter__body" id="letterBody"></div>
+      <p class="letter__sign" data-bind="you"></p>
+      <button class="mono letter__close" id="letterClose">close</button>
+    </article>
+  </div>
+
+  <script type="module">
+    import { CONFIG } from './config.js';
+    import { boot } from '../js/main.js';
+    boot(CONFIG, 'islamic');
+  </script>
+</body>
+</html>

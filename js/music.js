@@ -2,6 +2,7 @@
  * A small music box, played live with the Web Audio API.
  * I–iii–vi–IV in F with a slow melody on top; nothing is pre-recorded.
  * If a song file is given in the config, that plays instead.
+ * sound: 'musicbox' (default) | 'ambient' (soft night air, no instruments) | 'none'.
  */
 
 const BPM = 64;
@@ -23,14 +24,19 @@ const ARP = [0, 1, 2, 3, 2, 1, 3, 2];
 const freq = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
 
 export class Music {
-  constructor(songUrl) {
+  constructor(songUrl, sound = 'musicbox') {
     this.songUrl = songUrl;
+    this.sound = sound;
     this.muted = false;
     this.ctx = null;
   }
 
+  get silent() {
+    return !this.songUrl && this.sound === 'none';
+  }
+
   start() {
-    if (this.ctx) return;
+    if (this.ctx || this.silent) return;
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
     const ctx = (this.ctx = new Ctx());
@@ -50,6 +56,11 @@ export class Music {
       this.audio.crossOrigin = 'anonymous';
       ctx.createMediaElementSource(this.audio).connect(this.master);
       this.audio.play().catch(() => {});
+      return;
+    }
+
+    if (this.sound === 'ambient') {
+      this.#ambient();
       return;
     }
 
@@ -96,9 +107,23 @@ export class Music {
     return this.muted;
   }
 
+  // A single soft tine for each step of a multi-step hold.
+  chime(step) {
+    if (!this.ctx || this.audio || this.sound !== 'musicbox') return;
+    this.#bell(freq([77, 81, 84][(step - 1) % 3]), this.ctx.currentTime + 0.02, 0.16, 3);
+  }
+
   // A rising shimmer for the moment the knot is tied.
   swell() {
     if (!this.ctx || this.audio) return;
+    if (this.air) {
+      const now = this.ctx.currentTime;
+      this.air.gain.cancelScheduledValues(now);
+      this.air.gain.setValueAtTime(this.air.gain.value, now);
+      this.air.gain.linearRampToValueAtTime(0.5, now + 1.5);
+      this.air.gain.linearRampToValueAtTime(0.22, now + 9);
+      return;
+    }
     const now = this.ctx.currentTime + 0.05;
     const notes = [65, 69, 72, 76, 77, 81, 84, 88, 89, 93];
     notes.forEach((n, i) => this.#bell(freq(n), now + i * 0.07, 0.22 - i * 0.012, 3.2));
@@ -184,6 +209,38 @@ export class Music {
         o.stop(t + length + 0.1);
       }
     }
+  }
+
+  // Night air: slow, breathing filtered noise. No instruments.
+  #ambient() {
+    const ctx = this.ctx;
+    const len = ctx.sampleRate * 6;
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      let last = 0;
+      for (let i = 0; i < len; i++) {
+        last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; // brown noise
+        d[i] = last * 3.2;
+      }
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 420;
+    lp.Q.value = 0.4;
+    const lfo = ctx.createOscillator();
+    const lfoDepth = ctx.createGain();
+    lfo.frequency.value = 0.07;
+    lfoDepth.gain.value = 220;
+    lfo.connect(lfoDepth).connect(lp.frequency);
+    this.air = ctx.createGain();
+    this.air.gain.value = 0.22;
+    src.connect(lp).connect(this.air).connect(this.master);
+    src.start();
+    lfo.start();
   }
 
   #impulse(seconds) {

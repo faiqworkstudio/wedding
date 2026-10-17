@@ -8,7 +8,7 @@
 
 export const CONFIG = {
   // Her name is the one the stars spell out at the very end.
-  her: 'Amara',
+  her: 'Afreen',
   you: 'Faiq',
 
   // ISO dates (YYYY-MM-DD). `met` drives the "days" counter,

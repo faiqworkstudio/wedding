@@ -1,0 +1,168 @@
+/* Islamic theme: emerald night, a golden thread, geometry instead of hearts. */
+
+.theme-islamic {
+  --ink: #07110f;
+  --ink-2: #0d1c18;
+  --paper: #f4ecda;
+  --paper-dim: rgba(244, 236, 218, 0.86);
+  --paper-faint: rgba(244, 236, 218, 0.4);
+  --thread: #e0ac52;
+  --thread-soft: rgba(224, 172, 82, 0.35);
+  --gold: #ecc77f;
+  --emerald: #5fd3a6;
+  --arabic: 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif;
+}
+
+.theme-islamic main {
+  text-shadow: 0 0 2px rgba(7, 17, 15, 0.95), 0 0 12px rgba(7, 17, 15, 0.95), 0 0 32px rgba(7, 17, 15, 0.9);
+}
+
+.theme-islamic ::selection { background: var(--thread); color: var(--ink); }
+
+/* An eight-point star lattice, barely there, lit from the centre. */
+.pattern {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.11;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23e0ac52' stroke-width='0.8'%3E%3Crect x='28' y='28' width='40' height='40'/%3E%3Crect x='28' y='28' width='40' height='40' transform='rotate(45 48 48)'/%3E%3Ccircle cx='48' cy='48' r='9'/%3E%3Cpath d='M0 0L19.7 19.7M96 0L76.3 19.7M0 96L19.7 76.3M96 96L76.3 76.3M48 0V19.7M48 96V76.3M0 48H19.7M96 48H76.3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 96px 96px;
+  background-position: center;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(ellipse at 50% 50%, #000 0%, transparent 70%);
+  animation: breathe 14s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.08; transform: scale(1); }
+  50% { opacity: 0.14; transform: scale(1.03); }
+}
+
+.theme-islamic .vignette {
+  background: radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(2, 8, 7, 0.88) 100%);
+}
+
+.theme-islamic .gate { background: radial-gradient(ellipse at center, #0f211c, var(--ink) 75%); }
+
+.arabic {
+  font-family: var(--arabic);
+  font-weight: 400;
+  font-style: normal;
+  direction: rtl;
+}
+
+.gate__bismillah {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.7rem, 4.6vw, 2.6rem);
+  line-height: 1.6;
+  color: var(--gold);
+  opacity: 0;
+  animation: rise 2.6s var(--ease-out) forwards;
+}
+
+.theme-islamic .gate__kicker { animation-delay: 0.9s; }
+.theme-islamic .gate__title { animation-delay: 1.3s; }
+.theme-islamic .gate__seal { animation-delay: 1.8s; }
+.theme-islamic .gate__hint { animation-delay: 2.4s; }
+
+.theme-islamic .gate__seal path {
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-dasharray: 640;
+  stroke-dashoffset: 640;
+  transform-origin: 50% 50%;
+  animation: draw 3.6s var(--ease-silk) 1.9s forwards, turn 40s linear 5.5s infinite;
+}
+
+.theme-islamic .gate:hover .gate__seal path,
+.theme-islamic .gate:focus-visible .gate__seal path { fill: var(--thread-soft); }
+
+@keyframes turn { to { transform: rotate(360deg); } }
+
+/* chapter numerals are Arabic-Indic digits */
+.theme-islamic .chapter__num {
+  font-family: var(--arabic);
+  font-style: normal;
+  color: var(--gold);
+  transform: translateY(20px);
+}
+
+.theme-islamic .is-in .chapter__num,
+.theme-islamic .chapter__num.is-in { transform: none; }
+
+/* verses */
+
+.verse {
+  margin: 0;
+  display: grid;
+  gap: 1.8rem;
+  justify-items: center;
+  max-width: 44rem;
+}
+
+.ayah {
+  margin: 0;
+  font-size: clamp(1.9rem, 4.6vw, 3.1rem);
+  line-height: 2;
+  color: var(--gold);
+}
+
+.ayah .ch { filter: blur(4px); transition-delay: calc(var(--i) * 110ms); }
+
+.verse__english {
+  margin: 0;
+  max-width: 36rem;
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  line-height: 1.55;
+  color: var(--paper);
+}
+
+.verse__english::before,
+.verse__english::after { color: var(--gold); }
+.verse__english::before { content: '“'; }
+.verse__english::after { content: '”'; }
+
+.verse figcaption { color: var(--emerald); }
+
+/* finale */
+
+.theme-islamic .finale__after { font-size: clamp(1.7rem, 3.8vw, 2.3rem); color: var(--gold); }
+.theme-islamic .finale__names { margin: 20svh 0 1.2rem; }
+
+.finale__dua {
+  margin: 0;
+  font-size: clamp(1.25rem, 3.2vw, 1.7rem);
+  line-height: 1.7;
+  color: var(--gold);
+}
+
+.finale__dua-en {
+  margin: -0.4rem 0 0;
+  max-width: 30rem;
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  line-height: 1.45;
+}
+
+.finale__dua-ref { margin: -0.3rem 0 0.6rem; font-size: 0.7rem; color: var(--emerald); }
+
+.theme-islamic .finale__foot { gap: 0.6rem; }
+.theme-islamic .envelope { margin-top: 0.6rem; }
+
+.theme-islamic .envelope__seal { background: radial-gradient(circle at 35% 35%, #4fb68f, #12523d); }
+.theme-islamic .letter__sign { color: #1d5a45; }
+
+.theme-islamic .hold {
+  background: radial-gradient(circle, rgba(224, 172, 82, 0.14), transparent 70%);
+}
+
+.theme-islamic .hold__label { font-size: 1.55rem; }
+
+@media (max-width: 600px) {
+  .theme-islamic .finale { padding-top: 9svh; }
+  .theme-islamic .finale__names { margin-top: 6svh; }
+  .theme-islamic .finale__foot { gap: 0.45rem; }
+  .finale__dua-en { font-size: 1rem; }
+}

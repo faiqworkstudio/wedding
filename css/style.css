@@ -2,14 +2,14 @@
   --ink: #0d0a09;
   --ink-2: #17110f;
   --paper: #efe6d8;
-  --paper-dim: rgba(239, 230, 216, 0.62);
-  --paper-faint: rgba(239, 230, 216, 0.28);
+  --paper-dim: rgba(239, 230, 216, 0.86);
+  --paper-faint: rgba(239, 230, 216, 0.4);
   --thread: #d8352a;
   --thread-soft: rgba(216, 53, 42, 0.35);
   --gold: #d9b67a;
 
   --serif: 'Cormorant Garamond', 'Times New Roman', serif;
-  --script: 'Mrs Saint Delafield', 'Snell Roundhand', cursive;
+  --script: 'Great Vibes', 'Snell Roundhand', cursive;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -27,7 +27,7 @@ body {
   background: var(--ink);
   color: var(--paper);
   font-family: var(--serif);
-  font-weight: 300;
+  font-weight: 400;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -38,8 +38,9 @@ body.is-locked { overflow: hidden; height: 100svh; }
 
 .mono {
   font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--paper-dim);
 }
@@ -82,7 +83,7 @@ body.is-locked { overflow: hidden; height: 100svh; }
   background: radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(5, 3, 3, 0.85) 100%);
 }
 
-main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9), 0 0 4px rgba(13, 10, 9, 0.6); }
+main { position: relative; z-index: 2; text-shadow: 0 0 2px rgba(13, 10, 9, 0.95), 0 0 12px rgba(13, 10, 9, 0.95), 0 0 32px rgba(13, 10, 9, 0.9); }
 
 /* ── gate ───────────────────────────────────────────────── */
 
@@ -102,11 +103,11 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
   outline: none;
 }
 
-.gate.is-open { opacity: 0; visibility: hidden; }
+.gate.is-open { opacity: 0; visibility: hidden; pointer-events: none; }
 
 .gate__title {
   margin: 0;
-  font-weight: 300;
+  font-weight: 400;
   font-style: italic;
   font-size: clamp(2.6rem, 8vw, 6rem);
   line-height: 1;
@@ -232,10 +233,13 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 
 .lead {
   margin: 0;
-  font-size: clamp(1.8rem, 4.6vw, 3.4rem);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.8vw, 3.6rem);
   line-height: 1.15;
-  font-weight: 300;
+  font-weight: 400;
 }
+
+.opening__cite { margin: 1.4rem 0 0; }
 
 .lead--second {
   margin-top: 70vh;
@@ -267,7 +271,7 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 
 .title {
   margin: 0 0 3rem;
-  font-weight: 300;
+  font-weight: 400;
   font-size: clamp(2rem, 5vw, 3.6rem);
   line-height: 1.05;
   font-style: italic;
@@ -283,7 +287,7 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 
 .chapter__num {
   font-style: italic;
-  font-weight: 300;
+  font-weight: 400;
   font-size: clamp(4.5rem, 13vw, 9rem);
   line-height: 0.7;
   color: var(--thread);
@@ -297,7 +301,7 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 
 .chapter__title {
   margin: 0;
-  font-weight: 300;
+  font-weight: 400;
   font-size: clamp(2.4rem, 6.4vw, 4.8rem);
   line-height: 1;
 }
@@ -305,9 +309,9 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 .chapter__body {
   margin: 0.6rem 0 0;
   max-width: 34rem;
-  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  font-size: clamp(1.3rem, 2.4vw, 1.6rem);
   line-height: 1.6;
-  color: var(--paper-dim);
+  color: var(--paper);
 }
 
 .print {
@@ -356,14 +360,15 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 }
 
 .things li {
-  font-family: var(--script);
-  font-size: clamp(2rem, 5.4vw, 3.4rem);
-  line-height: 1.1;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  line-height: 1.25;
   color: var(--paper);
   transform: rotate(var(--tilt));
 }
 
-.things li .ch { filter: blur(3px); transition-delay: calc(var(--i) * 32ms); }
+.things li .ch { filter: blur(2px); transition-delay: calc(var(--i) * 32ms); }
 
 .things li::after {
   content: '';
@@ -391,7 +396,7 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 .number__value {
   display: block;
   font-size: clamp(3.6rem, 9vw, 6rem);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -479,7 +484,8 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
   display: block;
   padding: 0 1.6rem;
   font-style: italic;
-  font-size: 1.3rem;
+  font-weight: 500;
+  font-size: 1.4rem;
   line-height: 1.2;
 }
 
@@ -498,6 +504,26 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 }
 
 .hold__hint { margin: 1.4rem 0 0; }
+
+.hold.is-step { animation: step 0.9s var(--ease-out); }
+
+@keyframes step {
+  0% { transform: scale(0.94); }
+  40% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.hold__dots { display: flex; gap: 0.9rem; margin-top: 0.4rem; }
+
+.hold__dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--thread);
+  transition: background 0.6s, box-shadow 0.6s;
+}
+
+.hold__dots i.is-on { background: var(--thread); box-shadow: 0 0 12px var(--thread); }
 
 .finale {
   place-content: stretch;
@@ -519,15 +545,15 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
   align-self: start;
   margin: 0;
   font-style: italic;
-  font-size: clamp(1.3rem, 3vw, 1.8rem);
-  color: var(--paper-dim);
+  font-size: clamp(1.5rem, 3.4vw, 2rem);
+  color: var(--paper);
 }
 
 /* The stars write her name just above this line. */
 .finale__names {
   margin: 18svh 0 0;
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   letter-spacing: 0.4em;
   text-transform: uppercase;
   color: var(--paper-dim);
@@ -636,7 +662,8 @@ main { position: relative; z-index: 2; text-shadow: 0 0 24px rgba(13, 10, 9, 0.9
 
 .letter__body p {
   margin: 0 0 1.1rem;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
+  font-weight: 500;
   line-height: 1.72;
   font-style: italic;
 }

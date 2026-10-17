@@ -17,6 +17,38 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 const TAU = Math.PI * 2;
 const SEGMENTS = 420;
 
+// Each page passes its own palette, shapes and lettering.
+export const THEMES = {
+  thread: {
+    clear: 0x0d0a09,
+    thread: '#e2392b',
+    soulA: '#ffc98a',
+    soulB: '#ff8e86',
+    dustA: '#ffd19e',
+    dustB: '#ff7361',
+    nameA: '#ffc77a',
+    nameB: '#fff0dc',
+    nameC: '#ff4733',
+    middle: 'heart',
+    knot: 'trefoil',
+    nameFont: '"Great Vibes", cursive',
+  },
+  islamic: {
+    clear: 0x07110f,
+    thread: '#e0ac52',
+    soulA: '#ffe3b0',
+    soulB: '#bff0dc',
+    dustA: '#ffe2ae',
+    dustB: '#7fd6b4',
+    nameA: '#ffd58a',
+    nameB: '#fff6e4',
+    nameC: '#5fd3a6',
+    middle: 'arch',
+    knot: 'star',
+    nameFont: '700 "Amiri", serif',
+  },
+};
+
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 const damp = (a, b, lambda, dt) => a + (b - a) * (1 - Math.exp(-lambda * dt));
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -54,20 +86,20 @@ const pointFrag = /* glsl */ `
 `;
 
 export class Scene {
-  constructor(canvas) {
+  constructor(canvas, theme = THEMES.thread) {
     this.canvas = canvas;
+    this.theme = theme;
     this.small = Math.min(window.innerWidth, window.innerHeight) < 700;
 
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
     // The clear colour is encoded to sRGB once by the clear and again by the
     // OutputPass, so decode it one extra time to land on the real #0d0a09.
-    this.renderer.setClearColor(new THREE.Color(0x0d0a09).convertSRGBToLinear(), 1);
+    this.renderer.setClearColor(new THREE.Color(theme.clear).convertSRGBToLinear(), 1);
     this.pixelRatio = Math.min(window.devicePixelRatio || 1, this.small ? 1.6 : 1.75);
     this.renderer.setPixelRatio(this.pixelRatio);
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x0d0a09, 0.045);
-    this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+        this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     this.camera.position.set(0, 0, 15);
 
     // story targets (set from scroll) and their smoothed values
@@ -122,6 +154,8 @@ export class Scene {
       uPixel: { value: this.pixelRatio },
       uDrift: { value: 0 },
       uOpacity: { value: 0 },
+      uColorA: { value: new THREE.Color(this.theme.dustA) },
+      uColorB: { value: new THREE.Color(this.theme.dustB) },
     };
 
     const mat = new THREE.ShaderMaterial({
@@ -132,6 +166,7 @@ export class Scene {
       vertexShader: /* glsl */ `
         attribute float aSeed;
         uniform float uTime, uPixel, uDrift, uOpacity;
+        uniform vec3 uColorA, uColorB;
         varying vec3 vColor;
         varying float vAlpha;
         void main() {
@@ -144,7 +179,7 @@ export class Scene {
           gl_PointSize = (0.6 + aSeed * aSeed * 2.6) * uPixel * (9.0 / -mv.z);
           float tw = 0.45 + 0.55 * sin(uTime * (0.5 + aSeed * 1.7) + aSeed * 40.0);
           vAlpha = tw * uOpacity * 0.75;
-          vColor = mix(vec3(1.0, 0.82, 0.62), vec3(1.0, 0.45, 0.38), step(0.86, aSeed));
+          vColor = mix(uColorA, uColorB, step(0.86, aSeed));
         }
       `,
       fragmentShader: pointFrag,
@@ -182,7 +217,7 @@ export class Scene {
       uGrow: { value: 0 },
       uGlow: { value: 0.6 },
       uOpacity: { value: 1 },
-      uColor: { value: new THREE.Color('#e2392b') },
+      uColor: { value: new THREE.Color(this.theme.thread) },
     };
 
     const mat = new THREE.ShaderMaterial({
@@ -242,8 +277,8 @@ export class Scene {
       this.scene.add(group);
       return group;
     };
-    this.soulA = make(new THREE.Color('#ffc98a')); // me
-    this.soulB = make(new THREE.Color('#ff8e86')); // her
+    this.soulA = make(new THREE.Color(this.theme.soulA)); // me
+    this.soulB = make(new THREE.Color(this.theme.soulB)); // her
   }
 
   #buildPost() {
@@ -265,7 +300,7 @@ export class Scene {
     const time = this.time;
     out.set(
       THREE.MathUtils.lerp(-sep, sep, t),
-      -0.5 - env * (0.5 + 0.3 * calm) + Math.sin(t * Math.PI * 3 + time * 0.6) * 0.28 * env * calm,
+      this.baseY - env * (0.5 + 0.3 * calm) + Math.sin(t * Math.PI * 3 + time * 0.6) * 0.28 * env * calm,
       Math.cos(t * Math.PI * 2 + time * 0.45) * 0.9 * env * calm,
     );
     return out;
@@ -295,6 +330,59 @@ export class Scene {
     return out;
   }
 
+  // A pointed arch, like a mihrab, wide enough to frame the verse:
+  // up one leg, over the apex, down the other.
+  #arch(t, out) {
+    const w = Math.min(3, this.halfW * 0.86);
+    const R = 1.3 * w;
+    const apex = Math.acos((w - R) / R); // angle where the two arcs meet
+    const leg = 1.8;
+    const arc = R * (Math.PI - apex);
+    const half = leg + arc;
+    const right = t > 0.5;
+    const d = (right ? 1 - t : t) * 2 * half;
+    const base = -2.7;
+    let x;
+    let y;
+    if (d < leg) {
+      x = -w;
+      y = base + d;
+    } else {
+      const a = Math.PI - (d - leg) / R;
+      x = -w + R + R * Math.cos(a);
+      y = base + leg + R * Math.sin(a);
+    }
+    out.set(right ? -x : x, y, Math.sin(t * TAU * 2 + this.time * 0.8) * 0.18);
+    return out;
+  }
+
+  // An eight-pointed star {8/3}, drawn as one unbroken line.
+  #star(t, out) {
+    const r = 1.75 * this.fit;
+    const f = t * 8;
+    const k = Math.min(7, Math.floor(f));
+    const local = f - k;
+    const angle = (i) => Math.PI / 2 + ((i * 3) % 8) * (TAU / 8);
+    const a0 = angle(k);
+    const a1 = angle(k + 1);
+    const x = THREE.MathUtils.lerp(Math.cos(a0), Math.cos(a1), local) * r;
+    const y = THREE.MathUtils.lerp(Math.sin(a0), Math.sin(a1), local) * r;
+    // turns slowly in its own plane, so it never looks squashed
+    const a = this.time * 0.12;
+    const ca = Math.cos(a);
+    const sa = Math.sin(a);
+    out.set(x * ca - y * sa, x * sa + y * ca + 0.15, Math.sin(t * TAU * 4 + this.time) * 0.08);
+    return out;
+  }
+
+  #middle(t, out) {
+    return this.theme.middle === 'arch' ? this.#arch(t, out) : this.#heart(t, out);
+  }
+
+  #end(t, out) {
+    return this.theme.knot === 'star' ? this.#star(t, out) : this.#knot(t, out);
+  }
+
   #updateThread() {
     const v = this.v;
     const tmpA = this._a || (this._a = new THREE.Vector3());
@@ -306,8 +394,8 @@ export class Scene {
       const t = i / (SEGMENTS - 1);
       const p = this.pts[i];
       this.#line(t, p);
-      if (heartW > 0.001) p.lerp(this.#heart(t, tmpA), heartW);
-      if (knotW > 0.001) p.lerp(this.#knot(t, tmpB), knotW);
+      if (heartW > 0.001) p.lerp(this.#middle(t, tmpA), heartW);
+      if (knotW > 0.001) p.lerp(this.#end(t, tmpB), knotW);
     }
 
     const pos = this.thread.geometry.attributes.position.array;
@@ -358,16 +446,21 @@ export class Scene {
       const scale = (this.small ? 1.25 : 1) * (1 - fin * 0.6);
       halo.scale.setScalar((1.25 + beat * 0.55 + v.knot * 0.6) * scale);
       core.scale.setScalar((0.26 + beat * 0.1) * scale);
-      halo.material.opacity = intro * (0.4 + beat * 0.3) * (1 - fin * 0.7);
-      core.material.opacity = intro * (1 - fin * 0.5);
+      halo.material.opacity = intro * (0.4 + beat * 0.3) * (1 - fin * 0.85);
+      core.material.opacity = intro * (1 - fin * 0.75);
     }
   }
 
   /* ── finale: the knot unravels into her name ──────────── */
 
+  #font(size) {
+    const f = this.theme.nameFont;
+    return /^\d/.test(f) ? f.replace(/^(\d+) /, `$1 ${size}px `) : `${size}px ${f}`;
+  }
+
   async #buildName(text) {
     try {
-      await document.fonts.load('120px "Mrs Saint Delafield"');
+      await document.fonts.load(this.#font(120));
     } catch (_) {
       /* fall back to whatever cursive is there */
     }
@@ -378,10 +471,10 @@ export class Scene {
     c.height = h;
     const g = c.getContext('2d');
     let size = h * 0.66;
-    g.font = `${size}px "Mrs Saint Delafield", cursive`;
+    g.font = this.#font(size);
     const measured = g.measureText(text).width;
     if (measured > w * 0.9) size *= (w * 0.9) / measured;
-    g.font = `${size}px "Mrs Saint Delafield", cursive`;
+    g.font = this.#font(size);
     g.textAlign = 'center';
     g.textBaseline = 'middle';
     g.fillStyle = '#fff';
@@ -398,14 +491,28 @@ export class Scene {
     if (!pairs) return;
 
     const count = this.small ? 3200 : 5200;
-    const worldW = Math.min(11, this.halfW * 1.8);
+    // Fit the lettering into a box above the centre, whatever the script's proportions.
+    const portrait = this.camera.aspect < 0.8;
+    const boxW = Math.min(9, this.halfW * (portrait ? 1.8 : 1.5));
+    const boxH = portrait ? 1.5 : 1.8;
+    const centreY = portrait ? 1.1 : 1.25;
+    let minX = w, maxX = 0, minY = h, maxY = 0;
+    for (let k = 0; k < hits.length; k += 2) {
+      minX = Math.min(minX, hits[k]);
+      maxX = Math.max(maxX, hits[k]);
+      minY = Math.min(minY, hits[k + 1]);
+      maxY = Math.max(maxY, hits[k + 1]);
+    }
+    const unit = Math.min(boxW / (maxX - minX + 1), boxH / (maxY - minY + 1));
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
     const target = new Float32Array(count * 3);
     const start = new Float32Array(count * 3);
     const seed = new Float32Array(count);
     for (let i = 0; i < count; i++) {
       const j = Math.floor(Math.random() * pairs) * 2;
-      target[i * 3] = ((hits[j] - w / 2) / w) * worldW + (Math.random() - 0.5) * 0.02;
-      target[i * 3 + 1] = (-(hits[j + 1] - h / 2) / w) * worldW + 0.35;
+      target[i * 3] = (hits[j] - cx) * unit + (Math.random() - 0.5) * 0.02;
+      target[i * 3 + 1] = -(hits[j + 1] - cy) * unit + centreY;
       target[i * 3 + 2] = (Math.random() - 0.5) * 0.12;
       // every star of her name starts somewhere on the knot
       const p = this.pts[Math.floor(Math.random() * SEGMENTS)];
@@ -420,7 +527,14 @@ export class Scene {
     geo.setAttribute('aStart', new THREE.BufferAttribute(start, 3));
     geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
 
-    this.nameUniforms = { uForm: { value: 0 }, uTime: { value: 0 }, uPixel: { value: this.pixelRatio } };
+    this.nameUniforms = {
+      uForm: { value: 0 },
+      uTime: { value: 0 },
+      uPixel: { value: this.pixelRatio },
+      uA: { value: new THREE.Color(this.theme.nameA) },
+      uB: { value: new THREE.Color(this.theme.nameB) },
+      uC: { value: new THREE.Color(this.theme.nameC) },
+    };
     const mat = new THREE.ShaderMaterial({
       uniforms: this.nameUniforms,
       transparent: true,
@@ -430,6 +544,7 @@ export class Scene {
         attribute vec3 aStart;
         attribute float aSeed;
         uniform float uForm, uTime, uPixel;
+        uniform vec3 uA, uB, uC;
         varying vec3 vColor;
         varying float vAlpha;
         void main() {
@@ -445,10 +560,7 @@ export class Scene {
           gl_PointSize = (0.9 + aSeed * 1.4) * uPixel * (7.0 / -mv.z);
           float tw = 0.6 + 0.4 * sin(uTime * (1.2 + aSeed * 2.0) + aSeed * 50.0);
           vAlpha = smoothstep(0.0, 0.08, uForm) * tw;
-          vec3 gold = vec3(1.0, 0.78, 0.48);
-          vec3 cream = vec3(1.0, 0.93, 0.85);
-          vec3 red = vec3(1.0, 0.28, 0.2);
-          vColor = mix(mix(gold, cream, aSeed), red, (1.0 - e) * 0.85 + step(0.9, fract(aSeed * 13.7)) * 0.6);
+          vColor = mix(mix(uA, uB, aSeed), uC, (1.0 - e) * 0.85 + step(0.9, fract(aSeed * 13.7)) * 0.6);
         }
       `,
       fragmentShader: pointFrag,
@@ -494,6 +606,7 @@ export class Scene {
     const halfH = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * 10;
     this.halfW = halfH * this.camera.aspect;
     this.fit = Math.min(1, this.halfW / 2.9);
+    this.baseY = this.camera.aspect < 0.8 ? -1.9 : -0.5;
   }
 
   /* ── loop ─────────────────────────────────────────────── */
