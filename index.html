@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>For you</title>
+  <meta name="theme-color" content="#0d0a09" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 82C18 60 8 42 20 28c10-11 24-7 30 5 6-12 20-16 30-5 12 14 2 32-30 54z' fill='none' stroke='%23d8352a' stroke-width='6'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+</head>
+<body class="is-locked">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- The gate: nothing moves until she opens it. -->
+  <div class="gate" id="gate" role="button" tabindex="0">
+    <p class="mono gate__kicker" data-bind="gate.kicker"></p>
+    <h1 class="gate__title" data-bind="gate.title"></h1>
+    <span class="gate__seal" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><path d="M50 82 C18 60 8 42 20 28 C30 17 44 21 50 33 C56 21 70 17 80 28 C92 42 82 60 50 82 Z" /></svg>
+    </span>
+    <p class="mono gate__hint" data-bind="gate.hint"></p>
+  </div>
+
+  <button class="sound" id="sound" aria-label="Toggle music" hidden>
+    <span></span><span></span><span></span><span></span>
+  </button>
+
+  <div class="progress" aria-hidden="true"><i id="progress"></i></div>
+
+  <main id="story">
+    <section class="panel panel--opening" data-scene="opening">
+      <p class="lead reveal" data-bind="opening.0"></p>
+      <p class="lead lead--second reveal" data-bind="opening.1"></p>
+      <p class="mono scroll-cue">scroll slowly</p>
+    </section>
+
+    <!-- chapters get injected here -->
+    <div id="chapters"></div>
+
+    <section class="panel panel--things" data-scene="things">
+      <h2 class="title reveal" data-bind="smallThings.title"></h2>
+      <ul class="things" id="things"></ul>
+    </section>
+
+    <section class="panel panel--numbers" data-scene="numbers">
+      <h2 class="title reveal" data-bind="numbers.title"></h2>
+      <div class="numbers" id="numbers"></div>
+    </section>
+
+    <section class="panel panel--vows" data-scene="vows">
+      <h2 class="title reveal" data-bind="vows.title"></h2>
+      <ol class="vows" id="vows"></ol>
+    </section>
+
+    <section class="panel panel--knot" data-scene="knot">
+      <div class="knot" id="knot">
+        <button class="hold" id="hold" aria-describedby="hold-hint">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="hold__track" cx="60" cy="60" r="54" />
+            <circle class="hold__fill" id="holdFill" cx="60" cy="60" r="54" />
+          </svg>
+          <span class="hold__label" data-bind="knot.prompt"></span>
+        </button>
+        <p class="mono hold__hint" id="hold-hint" data-bind="knot.hint"></p>
+      </div>
+
+      <div class="finale" id="finale" aria-live="polite">
+        <p class="finale__after" data-bind="knot.after"></p>
+        <!-- her name is written here in stars, by the 3D scene -->
+        <p class="finale__names"><span data-bind="you"></span> <em>&amp;</em> <span data-bind="her"></span></p>
+        <div class="finale__foot">
+          <p class="mono finale__date" id="finaleDate"></p>
+          <p class="mono finale__count" id="countdown"></p>
+          <button class="envelope" id="envelope" aria-label="Open the letter">
+            <span class="envelope__back"></span>
+            <span class="envelope__paper"></span>
+            <span class="envelope__flap"></span>
+            <span class="envelope__seal"></span>
+          </button>
+          <p class="mono envelope__hint">one more thing</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="letter" id="letter" role="dialog" aria-modal="true" aria-label="A letter" hidden>
+    <article class="letter__paper">
+      <div class="letter__body" id="letterBody"></div>
+      <p class="letter__sign" data-bind="you"></p>
+      <button class="mono letter__close" id="letterClose">close</button>
+    </article>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
