@@ -44,10 +44,38 @@ export const THEMES = {
     nameB: '#fff6e4',
     nameC: '#5fd3a6',
     middle: 'arch',
-    knot: 'star',
+    knot: 'crescent',
     nameFont: '700 "Amiri", serif',
   },
 };
+
+/*
+ * Crescent and star, as one path: around the outside of the crescent, back along
+ * its inner edge, a short hidden hop, then the outline of a small five-point star.
+ * Outer circle r=1.5 at the origin, inner circle r=1.25 at (0.65, 0).
+ */
+const CRESCENT = (() => {
+  const R = 1.5;
+  const r = 1.25;
+  const d = 0.65;
+  const tipX = (d * d + R * R - r * r) / (2 * d);
+  const tipY = Math.sqrt(R * R - tipX * tipX);
+  const outerFrom = Math.atan2(tipY, tipX);
+  const innerFrom = Math.atan2(-tipY, tipX - d);
+  const innerTo = Math.atan2(tipY, tipX - d) - TAU;
+  const star = { x: 1.12, y: 0.06, outer: 0.42, inner: 0.18 };
+  const starPts = Array.from({ length: 11 }, (_, i) => {
+    const rad = i % 2 ? star.inner : star.outer;
+    const a = Math.PI / 2 + (i * Math.PI) / 5;
+    return [star.x + Math.cos(a) * rad, star.y + Math.sin(a) * rad];
+  });
+  const hop = Math.hypot(starPts[0][0] - tipX, starPts[0][1] - tipY);
+  const lens = [R * (TAU - 2 * outerFrom), r * (innerFrom - innerTo), hop, 10 * Math.hypot(starPts[1][0] - starPts[0][0], starPts[1][1] - starPts[0][1])];
+  const total = lens.reduce((a, b) => a + b);
+  const cuts = [];
+  lens.reduce((acc, l) => (cuts.push((acc + l) / total), acc + l), 0);
+  return { R, r, d, tipX, tipY, outerFrom, innerFrom, innerTo, starPts, cuts };
+})();
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 const damp = (a, b, lambda, dt) => a + (b - a) * (1 - Math.exp(-lambda * dt));
@@ -217,6 +245,7 @@ export class Scene {
       uGrow: { value: 0 },
       uGlow: { value: 0.6 },
       uOpacity: { value: 1 },
+      uHide: { value: new THREE.Vector3(CRESCENT.cuts[1], CRESCENT.cuts[2], 0) },
       uColor: { value: new THREE.Color(this.theme.thread) },
     };
 
@@ -239,6 +268,7 @@ export class Scene {
       `,
       fragmentShader: /* glsl */ `
         uniform float uTime, uGrow, uGlow, uOpacity;
+        uniform vec3 uHide; // from, to, amount
         uniform vec3 uColor;
         varying float vT;
         varying float vSide;
@@ -252,7 +282,8 @@ export class Scene {
           float head = exp(-pow((vT - uGrow) * 70.0, 2.0)) * (1.0 - step(0.995, uGrow));
           vec3 col = uColor * (0.85 + pulse * uGlow * 1.8) + vec3(1.0, 0.75, 0.6) * core * 0.45;
           col += vec3(1.0, 0.85, 0.7) * head * 3.0;
-          gl_FragColor = vec4(col, (body * drawn + head * across) * uOpacity);
+          float hidden = uHide.z * smoothstep(uHide.x - 0.003, uHide.x + 0.002, vT) * (1.0 - smoothstep(uHide.y - 0.002, uHide.y + 0.003, vT));
+          gl_FragColor = vec4(col, (body * drawn + head * across) * uOpacity * (1.0 - hidden));
         }
       `,
     });
@@ -375,11 +406,47 @@ export class Scene {
     return out;
   }
 
+  #crescent(t, out) {
+    const c = CRESCENT;
+    const [c0, c1, c2] = c.cuts;
+    let x;
+    let y;
+    if (t < c0) {
+      const a = c.outerFrom + (t / c0) * (TAU - 2 * c.outerFrom);
+      x = Math.cos(a) * c.R;
+      y = Math.sin(a) * c.R;
+    } else if (t < c1) {
+      const a = c.innerFrom + ((t - c0) / (c1 - c0)) * (c.innerTo - c.innerFrom);
+      x = c.d + Math.cos(a) * c.r;
+      y = Math.sin(a) * c.r;
+    } else if (t < c2) {
+      const k = (t - c1) / (c2 - c1);
+      x = THREE.MathUtils.lerp(c.tipX, c.starPts[0][0], k);
+      y = THREE.MathUtils.lerp(c.tipY, c.starPts[0][1], k);
+    } else {
+      const f = Math.min(9.999, ((t - c2) / (1 - c2)) * 10);
+      const i = Math.floor(f);
+      const [ax, ay] = c.starPts[i];
+      const [bx, by] = c.starPts[i + 1];
+      x = THREE.MathUtils.lerp(ax, bx, f - i);
+      y = THREE.MathUtils.lerp(ay, by, f - i);
+    }
+    // tilted a little, as it is usually drawn, and breathing gently
+    const s = 1.05 * this.fit;
+    const a = -0.35 + Math.sin(this.time * 0.3) * 0.05;
+    const ca = Math.cos(a);
+    const sa = Math.sin(a);
+    x -= 0.05;
+    out.set((x * ca - y * sa) * s, (x * sa + y * ca) * s + 0.15, Math.sin(t * TAU * 3 + this.time) * 0.06);
+    return out;
+  }
+
   #middle(t, out) {
     return this.theme.middle === 'arch' ? this.#arch(t, out) : this.#heart(t, out);
   }
 
   #end(t, out) {
+    if (this.theme.knot === 'crescent') return this.#crescent(t, out);
     return this.theme.knot === 'star' ? this.#star(t, out) : this.#knot(t, out);
   }
 
@@ -640,6 +707,7 @@ export class Scene {
     const tu = this.threadUniforms;
     tu.uTime.value = this.time;
     tu.uGrow.value = this.v.grow;
+    tu.uHide.value.z = this.theme.knot === 'crescent' ? clamp01(this.v.knot * 1.6 - 0.5) : 0;
     tu.uGlow.value = 0.5 + this.v.knot * 1.2 + this.v.sync * 0.4;
 
     let bloom = 0.8 + this.v.knot * 0.4;

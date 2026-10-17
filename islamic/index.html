@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <script>
+    // Some servers (Live Server, serve, Vercel, Netlify) open this page at /islamic without the
+    // trailing slash, which would send every relative URL to the parent folder. Anchor them here.
+    if (!location.pathname.endsWith('/') && !/\.html?$/.test(location.pathname)) {
+      document.write('<base href="' + location.pathname + '/">');
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>For you, Afreen</title>
   <meta name="theme-color" content="#07110f" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50.0%208.0%20L79.7%2079.7%20L8.0%2050.0%20L79.7%2020.3%20L50.0%2092.0%20L20.3%2020.3%20L92.0%2050.0%20L20.3%2079.7%20Z' fill='none' stroke='%23e0ac52' stroke-width='6'/%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M79.81%2026.16%20A40.50%2040.50%200%201%200%2056.97%2088.72%20A33.75%2033.75%200%201%201%2079.81%2026.16%20Z%20M79.58%2047.73%20L74.36%2053.71%20L66.76%2051.39%20L70.84%2058.21%20L66.29%2064.72%20L74.03%2062.95%20L78.81%2069.29%20L79.52%2061.38%20L87.03%2058.79%20L79.73%2055.67%20Z' fill='none' stroke='%23e0ac52' stroke-width='6'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400&family=Great+Vibes&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
@@ -27,7 +34,7 @@
     <p class="mono gate__kicker" data-bind="gate.kicker"></p>
     <h1 class="gate__title" data-bind="gate.title"></h1>
     <span class="gate__seal" aria-hidden="true">
-      <svg viewBox="0 0 100 100"><path d="M50.0 8.0 L79.7 79.7 L8.0 50.0 L79.7 20.3 L50.0 92.0 L20.3 20.3 L92.0 50.0 L20.3 79.7 Z" /></svg>
+      <svg viewBox="0 0 100 100"><path pathLength="100" d="M79.81 26.16 A40.50 40.50 0 1 0 56.97 88.72 A33.75 33.75 0 1 1 79.81 26.16 Z M79.58 47.73 L74.36 53.71 L66.76 51.39 L70.84 58.21 L66.29 64.72 L74.03 62.95 L78.81 69.29 L79.52 61.38 L87.03 58.79 L79.73 55.67 Z" /></svg>
     </span>
     <p class="mono gate__hint" data-bind="gate.hint"></p>
   </div>

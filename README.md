@@ -21,7 +21,7 @@ The music is a little music box composed in code and played live with the Web Au
 The Islamic version opens with the Bismillah and the decree written fifty thousand years before creation
 (Sahih Muslim 2653). The golden thread draws a mihrab arch around Ar-Rum 30:21, and Al-Baqarah 2:187
 ("they are a garment for you…") follows later. At the end she holds three times for *Qubool hai*,
-which ties the thread into an eight-pointed star drawn as one unbroken line. The star then dissolves into
+which ties the golden thread into a crescent and a small star. That then dissolves into
 her name in Urdu script (آفرین), followed by the Prophet's ﷺ dua for the newly married, the countdown
 to the nikah and the letter. Instead of instruments, a soft "night air" ambience plays; you can add a
 nasheed or recitation via `song`, or set `sound: 'none'`.
@@ -58,7 +58,7 @@ css/style.css     typography, grain, layout, the hold button, envelope and lette
 js/config.js      ← your words (red thread version)
 islamic/          the Islamic version: index.html, islamic.css, config.js ← its words
 js/main.js        boot(config, theme): content, scroll → story, hold-to-tie, countdown, letter
-js/scene.js       Three.js: themes, the thread, the two heartbeats, heart/arch, knot/star, her name in stars
+js/scene.js       Three.js: themes, the thread, the two heartbeats, heart/arch, knot/crescent, her name in stars
 js/music.js       Web Audio music box, or soft ambience
 ```
 
